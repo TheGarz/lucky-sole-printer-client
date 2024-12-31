@@ -1,6 +1,6 @@
 {
   "name": "lucky-sole-printer-client",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Printer client for Lucky Sole application",
   "main": "dist/main.js",
   "repository": {
