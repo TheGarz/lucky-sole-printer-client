@@ -1,29 +1,67 @@
-const { execSync } = require('child_process');
+const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
-const sharp = require('sharp');
 
-const iconSizes = [16, 24, 32, 512];
-const sourceDir = path.join(__dirname, '../src/assets/icons');
-const svgFiles = fs.readdirSync(sourceDir).filter(file => file.endsWith('.svg'));
+const pngSizes = [16, 24, 32, 48, 64, 128, 256, 512];
+const icoSizes = [16, 24, 32, 48, 64, 128, 256]; // ICO format doesn't support 512px
+const iconsDir = path.join(__dirname, '../src/assets/icons');
+const outputDir = path.join(__dirname, '../src/assets/icons');
 
-for (const svgFile of svgFiles) {
-    const baseName = path.basename(svgFile, '.svg');
-    const svgPath = path.join(sourceDir, svgFile);
+async function convertSvgToPng(svgPath, size) {
+  const filename = path.basename(svgPath, '.svg');
+  const outputPath = path.join(outputDir, `${filename}-${size}.png`);
+  
+  await sharp(svgPath)
+    .resize(size, size)
+    .png()
+    .toFile(outputPath);
+  
+  console.log(`Generated ${outputPath}`);
+  return outputPath;
+}
 
-    for (const size of iconSizes) {
-        const outputName = `${baseName}-${size}.png`;
-        const outputPath = path.join(sourceDir, outputName);
-
-        sharp(svgPath)
-            .resize(size, size)
-            .png()
-            .toFile(outputPath)
-            .then(() => {
-                console.log(`Converted ${svgFile} to ${outputName}`);
-            })
-            .catch(err => {
-                console.error(`Failed to convert ${svgFile}:`, err);
-            });
+async function generateIco(svgPath) {
+  const filename = path.basename(svgPath, '.svg');
+  const pngFiles = [];
+  
+  // Generate PNGs for ICO sizes
+  for (const size of icoSizes) {
+    const pngPath = await convertSvgToPng(svgPath, size);
+    pngFiles.push({ size, path: pngPath });
+  }
+  
+  // Create ICO file
+  const icoPath = path.join(outputDir, `${filename}.ico`);
+  const toIco = require('to-ico');
+  const images = await Promise.all(pngFiles.map(async file => {
+    return fs.promises.readFile(file.path);
+  }));
+  
+  const ico = await toIco(images);
+  await fs.promises.writeFile(icoPath, ico);
+  console.log(`Generated ${icoPath}`);
+  
+  // Generate additional PNG sizes that aren't included in ICO
+  for (const size of pngSizes) {
+    if (!icoSizes.includes(size)) {
+      await convertSvgToPng(svgPath, size);
     }
-} 
+  }
+}
+
+async function main() {
+  // Ensure output directory exists
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
+  
+  // Get all SVG files
+  const files = fs.readdirSync(iconsDir).filter(file => file.endsWith('.svg'));
+  
+  for (const file of files) {
+    const svgPath = path.join(iconsDir, file);
+    await generateIco(svgPath);
+  }
+}
+
+main().catch(console.error); 
