@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Production build
+dist/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Runtime data
+.DS_Store
+.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo

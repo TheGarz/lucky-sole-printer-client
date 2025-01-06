@@ -1,0 +1,33 @@
+{
+  "name": "windsurf-print-client",
+  "version": "1.0.0",
+  "description": "Print client for Windsurf Print Service",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win portable",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "build": {
+    "appId": "com.windsurf.printclient",
+    "productName": "Windsurf Print Client",
+    "win": {
+      "target": "portable",
+      "icon": "assets/icon.ico"
+    }
+  },
+  "author": "Windsurf",
+  "license": "ISC",
+  "dependencies": {
+    "@electron/remote": "^2.0.12",
+    "node-printer": "^1.0.4",
+    "systeminformation": "^5.21.7",
+    "ws": "^8.14.2"
+  },
+  "devDependencies": {
+    "electron": "^27.1.0",
+    "electron-builder": "^24.9.1"
+  },
+  "keywords": [],
+  "type": "commonjs"
+}
