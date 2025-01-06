@@ -12,8 +12,7 @@
     "appId": "com.windsurf.printclient",
     "productName": "Windsurf Print Client",
     "win": {
-      "target": "portable",
-      "icon": "assets/icon.ico"
+      "target": "portable"
     }
   },
   "author": "Windsurf",
