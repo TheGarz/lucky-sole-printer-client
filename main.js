@@ -1,12 +1,10 @@
-const { app, BrowserWindow, ipcMain, Tray, Menu } = require('electron');
+const { app, BrowserWindow, ipcMain, Tray, Menu, nativeImage } = require('electron');
 const path = require('path');
 const WebSocket = require('ws');
 const si = require('systeminformation');
 const printer = require('node-printer');
 const fs = require('fs');
 const os = require('os');
-const { createIcon } = require('./assets/icon');
-require('@electron/remote/main').initialize();
 
 let mainWindow;
 let tray;
@@ -27,7 +25,7 @@ function createWindow() {
     mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
-        icon: createIcon(),
+        icon: path.join(__dirname, 'assets', 'images', 'icon.svg'),
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
@@ -50,7 +48,8 @@ function createWindow() {
 
 function createTray() {
     // Create tray with icon
-    tray = new Tray(createIcon());
+    const trayIcon = nativeImage.createFromPath(path.join(__dirname, 'assets', 'images', 'icon.svg'));
+    tray = new Tray(trayIcon.resize({ width: 16, height: 16 }));
     const contextMenu = Menu.buildFromTemplate([
         { 
             label: 'Show App', 
