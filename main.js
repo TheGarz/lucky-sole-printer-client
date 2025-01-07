@@ -5,6 +5,7 @@ const si = require('systeminformation');
 const printer = require('node-printer');
 const fs = require('fs');
 const os = require('os');
+const { createIcon } = require('./assets/icon');
 require('@electron/remote/main').initialize();
 
 let mainWindow;
@@ -26,6 +27,7 @@ function createWindow() {
     mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
+        icon: createIcon(),
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
@@ -47,7 +49,8 @@ function createWindow() {
 }
 
 function createTray() {
-    tray = new Tray(path.join(__dirname, 'assets', 'icon.png'));
+    // Create tray with icon
+    tray = new Tray(createIcon());
     const contextMenu = Menu.buildFromTemplate([
         { 
             label: 'Show App', 
