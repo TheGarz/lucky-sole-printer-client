@@ -95,43 +95,73 @@
     </div>
 
     <script>
-        const { ipcRenderer } = require('electron');
+        const electron = require('electron');
+        const { ipcRenderer } = electron;
         const fs = require('fs');
         const path = require('path');
-        const { app } = require('@electron/remote');
-        
+        const remote = require('@electron/remote');
+        const app = remote.app;
+
+        // Load existing config
         let config = {};
-        
-        // Load existing configuration
         try {
-            config = JSON.parse(fs.readFileSync(path.join(app.getPath('userData'), 'config.json')));
-            document.getElementById('apiKey').value = config.apiKey || '';
-            document.getElementById('serverUrl').value = config.serverUrl || 'ws://localhost:5001';
+            const configPath = path.join(app.getPath('userData'), 'config.json');
+            if (fs.existsSync(configPath)) {
+                config = JSON.parse(fs.readFileSync(configPath));
+                document.getElementById('apiKey').value = config.apiKey || '';
+                document.getElementById('serverUrl').value = config.serverUrl || 'ws://localhost:5001';
+                updateStatus('Loaded existing configuration');
+            }
         } catch (err) {
-            console.log('No config file found or invalid config');
+            console.error('Error loading config:', err);
+            updateStatus('Error loading configuration', false);
         }
 
         function saveConfig() {
             const apiKey = document.getElementById('apiKey').value;
             const serverUrl = document.getElementById('serverUrl').value;
             
-            config = { apiKey, serverUrl };
+            if (!apiKey) {
+                updateStatus('API Key is required', false);
+                return;
+            }
+
+            const configPath = path.join(app.getPath('userData'), 'config.json');
+            const config = { apiKey, serverUrl };
             
             try {
-                fs.writeFileSync(
-                    path.join(app.getPath('userData'), 'config.json'),
-                    JSON.stringify(config)
-                );
-                alert('Configuration saved successfully! Please restart the application.');
+                fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+                updateStatus('Configuration saved successfully');
+                ipcRenderer.send('config-updated', config);
             } catch (err) {
-                alert('Error saving configuration: ' + err.message);
+                console.error('Error saving config:', err);
+                updateStatus('Error saving configuration', false);
             }
         }
 
-        // Update status periodically
-        setInterval(() => {
-            // Add status update logic here
-        }, 5000);
+        function updateStatus(message, isSuccess = true) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = 'status ' + (isSuccess ? 'connected' : 'disconnected');
+        }
+
+        // Listen for printer updates
+        ipcRenderer.on('printers-list', (event, printers) => {
+            const printersDiv = document.getElementById('printers');
+            printersDiv.innerHTML = '<h2>Available Printers</h2>';
+            
+            printers.forEach(printer => {
+                const printerDiv = document.createElement('div');
+                printerDiv.className = 'printer-item';
+                printerDiv.textContent = printer.name;
+                printersDiv.appendChild(printerDiv);
+            });
+        });
+
+        // Listen for connection status
+        ipcRenderer.on('connection-status', (event, status) => {
+            updateStatus(status.message, status.connected);
+        });
     </script>
 </body>
 </html>

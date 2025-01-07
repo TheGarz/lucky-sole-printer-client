@@ -5,6 +5,7 @@ const si = require('systeminformation');
 const printer = require('node-printer');
 const fs = require('fs');
 const os = require('os');
+require('@electron/remote/main').initialize();
 
 let mainWindow;
 let tray;
@@ -27,11 +28,14 @@ function createWindow() {
         height: 600,
         webPreferences: {
             nodeIntegration: true,
-            contextIsolation: false
+            contextIsolation: false,
+            enableRemoteModule: true
         }
     });
 
+    require('@electron/remote/main').enable(mainWindow.webContents);
     mainWindow.loadFile('index.html');
+    mainWindow.webContents.openDevTools(); // Add this for debugging
     
     // Hide window on close
     mainWindow.on('close', (event) => {
