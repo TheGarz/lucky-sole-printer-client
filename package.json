@@ -5,14 +5,32 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder --win portable",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "electron-builder --win",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install-service": "node install-service.js",
+    "uninstall-service": "node uninstall-service.js"
   },
   "build": {
     "appId": "com.windsurf.printclient",
     "productName": "Windsurf Print Client",
     "win": {
-      "target": "portable"
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "runAfterFinish": true,
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico",
+      "installerHeaderIcon": "assets/icon.ico",
+      "include": "installer.nsh"
     }
   },
   "author": "Windsurf",
@@ -20,6 +38,7 @@
   "dependencies": {
     "@electron/remote": "^2.0.12",
     "node-printer": "^1.0.4",
+    "node-windows": "^1.0.0-beta.8",
     "systeminformation": "^5.21.7",
     "ws": "^8.14.2"
   },
