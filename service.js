@@ -8,7 +8,7 @@ const os = require('os');
 let ws;
 let apiKey;
 let serverUrl = 'ws://localhost:5001';
-const configPath = path.join(process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming'), 'windsurf-print-client', 'config.json');
+const configPath = path.join(process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming'), 'sightline-print-client', 'config.json');
 
 // Load config if exists
 try {

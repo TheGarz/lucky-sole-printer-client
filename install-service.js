@@ -3,8 +3,8 @@ const path = require('path');
 
 // Create a new service object
 const svc = new Service({
-    name: 'WindsurfPrintClient',
-    description: 'Windsurf Print Client Service',
+    name: 'SightLinePrintClient',
+    description: 'SightLine Print Client Service',
     script: path.join(__dirname, 'service.js'),
     nodeOptions: [],
     env: [{
